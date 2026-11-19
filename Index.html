@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Index</title></head>
+<body>
+<p>&lt;!DOCTYPE html&gt;<br>
+&lt;html lang=&quot;fa&quot; dir=&quot;rtl&quot;&gt;<br>
+&lt;head&gt;<br>
+    &lt;meta charset=&quot;UTF-8&quot;&gt;<br>
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;&gt;<br>
+    &lt;title&gt;Idle Hero Arena - Telegram Mini App&lt;/title&gt;<br>
+    &lt;!-- اتصال به SDK رسمی تلگرام --&gt;<br>
+    &lt;script src=&quot;https://telegram.org/js/telegram-web-app.js&quot;&gt;&lt;/script&gt;<br>
+    &lt;style&gt;<br>
+        :root {<br>
+            --bg-color: #12141d;<br>
+            --card-bg: #1e2230;<br>
+            --accent: #f59e0b;<br>
+            --hp-hero: #10b981;<br>
+            --hp-enemy: #ef4444;<br>
+            --text-main: #f3f4f6;<br>
+            --text-muted: #9ca3af;<br>
+        }<br>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; user-select: none; }<br>
+        body {<br>
+            background-color: var(--bg-color);<br>
+            color: var(--text-main);<br>
+            display: flex;<br>
+            flex-direction: column;<br>
+            height: 100vh;<br>
+            overflow: hidden;<br>
+            padding: 12px;<br>
+        }<br>
+        .header {<br>
+            display: flex;<br>
+            justify-content: space-between;<br>
+            align-items: center;<br>
+            background: var(--card-bg);<br>
+            padding: 10px 15px;<br>
+            border-radius: 12px;<br>
+            margin-bottom: 12px;<br>
+        }<br>
+        .stage-badge { background: #3b82f6; padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 14px; }<br>
+        .gold-display { color: var(--accent); font-weight: bold; font-size: 18px; }</p>
+<p>        /* میدان نبرد */<br>
+        .arena {<br>
+            flex: 1;<br>
+            background: linear-gradient(180deg, #1a1d2b 0%, #12141d 100%);<br>
+            border: 1px solid #2d3348;<br>
+            border-radius: 16px;<br>
+            display: flex;<br>
+            flex-direction: column;<br>
+            justify-content: space-around;<br>
+            align-items: center;<br>
+            padding: 16px;<br>
+            position: relative;<br>
+            margin-bottom: 12px;<br>
+        }<br>
+        .combatants {<br>
+            display: flex;<br>
+            justify-content: space-around;<br>
+            align-items: center;<br>
+            width: 100%;<br>
+        }<br>
+        .unit { text-align: center; width: 42%; }<br>
+        .avatar {<br>
+            width: 75px; height: 75px;<br>
+            margin: 0 auto 8px;<br>
+            border-radius: 50%;<br>
+            display: flex; align-items: center; justify-content: center;<br>
+            font-size: 36px;<br>
+            background: #282d40;<br>
+            transition: transform 0.1s;<br>
+        }<br>
+        .hero-avatar { border: 3px solid var(--hp-hero); }<br>
+        .enemy-avatar { border: 3px solid var(--hp-enemy); }<br>
+        .attack-anim { transform: scale(1.15); }<br>
+        <br>
+        .hp-bar-bg { width: 100%; height: 10px; background: #374151; border-radius: 5px; overflow: hidden; margin-top: 6px; }<br>
+        .hp-bar-fill { height: 100%; transition: width 0.15s linear; }<br>
+        .hero-hp { background: var(--hp-hero); width: 100%; }<br>
+        .enemy-hp { background: var(--hp-enemy); width: 100%; }<br>
+        .stats-text { font-size: 12px; color: var(--text-muted); margin-top: 4px; }</p>
+<p>        .floating-dmg {<br>
+            position: absolute;<br>
+            color: #fbbf24;<br>
+            font-weight: bold;<br>
+            font-size: 18px;<br>
+            animation: floatUp 0.7s ease-out forwards;<br>
+            pointer-events: none;<br>
+        }<br>
+        @keyframes floatUp {<br>
+            0% { opacity: 1; transform: translateY(0); }<br>
+            100% { opacity: 0; transform: translateY(-40px); }<br>
+        }</p>
+<p>        /* دکمه تبلیغ و بوستر (نقطه درآمدزایی) */<br>
+        .ad-banner {<br>
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);<br>
+            border: none;<br>
+            color: white;<br>
+            padding: 12px;<br>
+            border-radius: 12px;<br>
+            font-weight: bold;<br>
+            font-size: 14px;<br>
+            width: 100%;<br>
+            margin-bottom: 12px;<br>
+            cursor: pointer;<br>
+            display: flex;<br>
+            justify-content: center;<br>
+            align-items: center;<br>
+            gap: 8px;<br>
+        }<br>
+        .ad-banner:disabled { opacity: 0.7; cursor: default; }</p>
+<p>        /* پنل ارتقاها */<br>
+        .upgrades {<br>
+            display: flex;<br>
+            flex-direction: column;<br>
+            gap: 8px;<br>
+        }<br>
+        .upgrade-card {<br>
+            background: var(--card-bg);<br>
+            padding: 12px;<br>
+            border-radius: 12px;<br>
+            display: flex;<br>
+            justify-content: space-between;<br>
+            align-items: center;<br>
+        }<br>
+        .upg-info h4 { font-size: 14px; margin-bottom: 2px; }<br>
+        .upg-info p { font-size: 12px; color: var(--text-muted); }<br>
+        .upg-btn {<br>
+            background: var(--accent);<br>
+            color: #111;<br>
+            border: none;<br>
+            padding: 8px 14px;<br>
+            border-radius: 8px;<br>
+            font-weight: bold;<br>
+            font-size: 13px;<br>
+            cursor: pointer;<br>
+            min-width: 90px;<br>
+        }<br>
+        .upg-btn:disabled { background: #4b5563; color: #9ca3af; cursor: not-allowed; }<br>
+    &lt;/style&gt;<br>
+&lt;/head&gt;<br>
+&lt;body&gt;</p>
+<p>    &lt;div class=&quot;header&quot;&gt;<br>
+        &lt;div&gt;<br>
+            &lt;span id=&quot;player-name&quot; style=&quot;font-size: 13px; color: var(--text-muted);&quot;&gt;قهرمان&lt;/span&gt;<br>
+            &lt;div class=&quot;stage-badge&quot;&gt;مرحله &lt;span id=&quot;stage-num&quot;&gt;1&lt;/span&gt;&lt;/div&gt;<br>
+        &lt;/div&gt;<br>
+        &lt;div class=&quot;gold-display&quot;&gt;💰 &lt;span id=&quot;gold-num&quot;&gt;0&lt;/span&gt;&lt;/div&gt;<br>
+    &lt;/div&gt;</p>
+<p>    &lt;div class=&quot;arena&quot; id=&quot;arena&quot;&gt;<br>
+        &lt;div class=&quot;combatants&quot;&gt;<br>
+            &lt;!-- هیرو --&gt;<br>
+            &lt;div class=&quot;unit&quot;&gt;<br>
+                &lt;div class=&quot;avatar hero-avatar&quot; id=&quot;hero-avatar&quot;&gt;⚔️&lt;/div&gt;<br>
+                &lt;div style=&quot;font-weight: bold; font-size: 14px;&quot;&gt;قهرمان من&lt;/div&gt;<br>
+                &lt;div class=&quot;hp-bar-bg&quot;&gt;&lt;div class=&quot;hp-bar-fill hero-hp&quot; id=&quot;hero-hp-bar&quot;&gt;&lt;/div&gt;&lt;/div&gt;<br>
+                &lt;div class=&quot;stats-text&quot;&gt;&lt;span id=&quot;hero-hp-text&quot;&gt;100/100&lt;/span&gt; | قدرت: &lt;span id=&quot;hero-atk-text&quot;&gt;10&lt;/span&gt;&lt;/div&gt;<br>
+            &lt;/div&gt;</p>
+<p>            &lt;!-- دشمن --&gt;<br>
+            &lt;div class=&quot;unit&quot;&gt;<br>
+                &lt;div class=&quot;avatar enemy-avatar&quot; id=&quot;enemy-avatar&quot;&gt;👹&lt;/div&gt;<br>
+                &lt;div style=&quot;font-weight: bold; font-size: 14px;&quot; id=&quot;enemy-name&quot;&gt;هیولای سطح 1&lt;/div&gt;<br>
+                &lt;div class=&quot;hp-bar-bg&quot;&gt;&lt;div class=&quot;hp-bar-fill enemy-hp&quot; id=&quot;enemy-hp-bar&quot;&gt;&lt;/div&gt;&lt;/div&gt;<br>
+                &lt;div class=&quot;stats-text&quot;&gt;&lt;span id=&quot;enemy-hp-text&quot;&gt;50/50&lt;/span&gt; | قدرت: &lt;span id=&quot;enemy-atk-text&quot;&gt;4&lt;/span&gt;&lt;/div&gt;<br>
+            &lt;/div&gt;<br>
+        &lt;/div&gt;<br>
+        &lt;div style=&quot;font-size: 12px; color: var(--text-muted);&quot;&gt;مبارزه خودکار فعال است... (برای ضربه سریع کلیک کنید)&lt;/div&gt;<br>
+    &lt;/div&gt;</p>
+<p>    &lt;!-- دکمه درآمدزایی تبلیغاتی --&gt;<br>
+    &lt;button class=&quot;ad-banner&quot; id=&quot;boost-btn&quot; onclick=&quot;activateAdBoost()&quot;&gt;<br>
+        🎬 تماشای تبلیغ: ۲ برابر قدرت و طلا (۶۰ ثانیه)<br>
+    &lt;/button&gt;</p>
+<p>    &lt;!-- ارتقاهای هیرو --&gt;<br>
+    &lt;div class=&quot;upgrades&quot;&gt;<br>
+        &lt;div class=&quot;upgrade-card&quot;&gt;<br>
+            &lt;div class=&quot;upg-info&quot;&gt;<br>
+                &lt;h4&gt;ارتقای شمشیر (سطح &lt;span id=&quot;atk-lvl&quot;&gt;1&lt;/span&gt;)&lt;/h4&gt;<br>
+                &lt;p&gt;افزایش قدرت حمله (+5)&lt;/p&gt;<br>
+            &lt;/div&gt;<br>
+            &lt;button class=&quot;upg-btn&quot; id=&quot;btn-upg-atk&quot; onclick=&quot;upgradeStat(&#x27;atk&#x27;)&quot;&gt;15 💰&lt;/button&gt;<br>
+        &lt;/div&gt;</p>
+<p>        &lt;div class=&quot;upgrade-card&quot;&gt;<br>
+            &lt;div class=&quot;upg-info&quot;&gt;<br>
+                &lt;h4&gt;ارتقای زره (سطح &lt;span id=&quot;hp-lvl&quot;&gt;1&lt;/span&gt;)&lt;/h4&gt;<br>
+                &lt;p&gt;افزایش جان حداکثر (+30)&lt;/p&gt;<br>
+            &lt;/div&gt;<br>
+            &lt;button class=&quot;upg-btn&quot; id=&quot;btn-upg-hp&quot; onclick=&quot;upgradeStat(&#x27;hp&#x27;)&quot;&gt;15 💰&lt;/button&gt;<br>
+        &lt;/div&gt;</p>
+<p>        &lt;div class=&quot;upgrade-card&quot;&gt;<br>
+            &lt;div class=&quot;upg-info&quot;&gt;<br>
+                &lt;h4&gt;سرعت حمله (سطح &lt;span id=&quot;spd-lvl&quot;&gt;1&lt;/span&gt;)&lt;/h4&gt;<br>
+                &lt;p&gt;ضربات سریع‌تر در ثانیه&lt;/p&gt;<br>
+            &lt;/div&gt;<br>
+            &lt;button class=&quot;upg-btn&quot; id=&quot;btn-upg-spd&quot; onclick=&quot;upgradeStat(&#x27;spd&#x27;)&quot;&gt;25 💰&lt;/button&gt;<br>
+        &lt;/div&gt;<br>
+    &lt;/div&gt;</p>
+<p>    &lt;script&gt;<br>
+        // راه‌اندازی SDK تلگرام<br>
+        const tg = window.Telegram.WebApp;<br>
+        tg.expand(); // تمام صفحه کردن مینی‌اپ<br>
+        if (tg.initDataUnsafe &amp;&amp; tg.initDataUnsafe.user) {<br>
+            document.getElementById(&#x27;player-name&#x27;).innerText = tg.initDataUnsafe.user.first_name;<br>
+        }</p>
+<p>        // وضعیت اولیه یا بازیابی از حافظه<br>
+        let state = JSON.parse(localStorage.getItem(&#x27;idleArenaSave&#x27;)) || {<br>
+            gold: 0,<br>
+            stage: 1,<br>
+            atkLvl: 1,<br>
+            hpLvl: 1,<br>
+            spdLvl: 1<br>
+        };</p>
+<p>        let boostMultiplier = 1;<br>
+        let boostTimeLeft = 0;</p>
+<p>        // محاسبه مشخصات هیرو بر اساس سطح ارتقا<br>
+        function getHeroStats() {<br>
+            return {<br>
+                maxHp: 100 + (state.hpLvl - 1) * 30,<br>
+                atk: (10 + (state.atkLvl - 1) * 5) * boostMultiplier,<br>
+                attackInterval: Math.max(250, 1000 - (state.spdLvl - 1) * 60) // میلی‌ثانیه<br>
+            };<br>
+        }</p>
+<p>        // تولید دشمن متناسب با مرحله (Scaling)<br>
+        const enemyIcons = [&#x27;👹&#x27;, &#x27;👺&#x27;, &#x27;🧟&#x27;, &#x27;🧛&#x27;, &#x27;🐉&#x27;, &#x27;👾&#x27;];<br>
+        function generateEnemy(stage) {<br>
+            const isBoss = stage % 5 === 0;<br>
+            const scale = Math.pow(1.18, stage - 1);<br>
+            return {<br>
+                name: isBoss ? `🔥 غول مرحله ${stage}` : `هیولای سطح ${stage}`,<br>
+                icon: isBoss ? &#x27;👑&#x27; : enemyIcons[(stage - 1) % enemyIcons.length],<br>
+                maxHp: Math.floor((isBoss ? 120 : 45) * scale),<br>
+                currentHp: Math.floor((isBoss ? 120 : 45) * scale),<br>
+                atk: Math.floor((isBoss ? 8 : 3) * Math.pow(1.15, stage - 1)),<br>
+                reward: Math.floor((isBoss ? 35 : 10) * Math.pow(1.16, stage - 1))<br>
+            };<br>
+        }</p>
+<p>        let heroCurrentHp = getHeroStats().maxHp;<br>
+        let currentEnemy = generateEnemy(state.stage);</p>
+<p>        // محاسبه هزینه ارتقاها<br>
+        function getUpgradeCost(type) {<br>
+            if (type === &#x27;atk&#x27;) return Math.floor(15 * Math.pow(1.25, state.atkLvl - 1));<br>
+            if (type === &#x27;hp&#x27;) return Math.floor(15 * Math.pow(1.25, state.hpLvl - 1));<br>
+            if (type === &#x27;spd&#x27;) return Math.floor(25 * Math.pow(1.35, state.spdLvl - 1));<br>
+        }</p>
+<p>        function upgradeStat(type) {<br>
+            const cost = getUpgradeCost(type);<br>
+            if (state.gold &gt;= cost) {<br>
+                state.gold -= cost;<br>
+                if (type === &#x27;atk&#x27;) state.atkLvl++;<br>
+                if (type === &#x27;hp&#x27;) {<br>
+                    state.hpLvl++;<br>
+                    heroCurrentHp = getHeroStats().maxHp;<br>
+                }<br>
+                if (type === &#x27;spd&#x27;) {<br>
+                    state.spdLvl++;<br>
+                    restartCombatLoop();<br>
+                }<br>
+                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred(&#x27;light&#x27;); // ویبره در تلگرام<br>
+                saveGame();<br>
+                updateUI();<br>
+            }<br>
+        }</p>
+<p>        function spawnDamageText(amount, isHeroTarget) {<br>
+            const arena = document.getElementById(&#x27;arena&#x27;);<br>
+            const el = document.createElement(&#x27;div&#x27;);<br>
+            el.className = &#x27;floating-dmg&#x27;;<br>
+            el.innerText = `-${amount}`;<br>
+            el.style.left = isHeroTarget ? &#x27;25%&#x27; : &#x27;70%&#x27;;<br>
+            el.style.top = &#x27;35%&#x27;;<br>
+            if (isHeroTarget) el.style.color = &#x27;#ef4444&#x27;;<br>
+            arena.appendChild(el);<br>
+            setTimeout(() =&gt; el.remove(), 700);<br>
+        }</p>
+<p>        // حمله هیرو به دشمن<br>
+        function heroAttack() {<br>
+            const hero = getHeroStats();<br>
+            currentEnemy.currentHp -= hero.atk;<br>
+            <br>
+            const avatar = document.getElementById(&#x27;hero-avatar&#x27;);<br>
+            avatar.classList.add(&#x27;attack-anim&#x27;);<br>
+            setTimeout(() =&gt; avatar.classList.remove(&#x27;attack-anim&#x27;), 100);<br>
+            spawnDamageText(hero.atk, false);</p>
+<p>            if (currentEnemy.currentHp &lt;= 0) {<br>
+                // پیروزی در مرحله<br>
+                state.gold += currentEnemy.reward * boostMultiplier;<br>
+                state.stage++;<br>
+                heroCurrentHp = Math.min(hero.maxHp, heroCurrentHp + Math.floor(hero.maxHp * 0.25)); // بازیابی ۲۵٪ جان<br>
+                currentEnemy = generateEnemy(state.stage);<br>
+                saveGame();<br>
+            }<br>
+            updateUI();<br>
+        }</p>
+<p>        // حمله دشمن به هیرو (هر 1.2 ثانیه)<br>
+        setInterval(() =&gt; {<br>
+            heroCurrentHp -= currentEnemy.atk;<br>
+            const avatar = document.getElementById(&#x27;enemy-avatar&#x27;);<br>
+            avatar.classList.add(&#x27;attack-anim&#x27;);<br>
+            setTimeout(() =&gt; avatar.classList.remove(&#x27;attack-anim&#x27;), 100);<br>
+            spawnDamageText(currentEnemy.atk, true);</p>
+<p>            if (heroCurrentHp &lt;= 0) {<br>
+                // شکست و بازگشت یک مرحله عقب‌تر (مکانیزم استاندارد Idle RPG)<br>
+                state.stage = Math.max(1, state.stage - 1);<br>
+                heroCurrentHp = getHeroStats().maxHp;<br>
+                currentEnemy = generateEnemy(state.stage);<br>
+                saveGame();<br>
+            }<br>
+            updateUI();<br>
+        }, 1200);</p>
+<p>        // کلیک دستی روی میدان نبرد برای کمک به هیرو<br>
+        document.getElementById(&#x27;arena&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; {<br>
+            heroAttack();<br>
+        });</p>
+<p>        // حلقه حمله خودکار هیرو<br>
+        let heroLoop;<br>
+        function restartCombatLoop() {<br>
+            clearInterval(heroLoop);<br>
+            heroLoop = setInterval(heroAttack, getHeroStats().attackInterval);<br>
+        }</p>
+<p>        // سیستم بوستر تبلیغاتی (اینجا کد SDK شبکه تبلیغاتی مثل Adsgram قرار می‌گیرد)<br>
+        function activateAdBoost() {<br>
+            if (boostTimeLeft &gt; 0) return;<br>
+            // شبیه‌سازی تماشای تبلیغ و دادن جایزه<br>
+            boostMultiplier = 2;<br>
+            boostTimeLeft = 60;<br>
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(&#x27;success&#x27;);<br>
+            updateUI();<br>
+        }</p>
+<p>        setInterval(() =&gt; {<br>
+            if (boostTimeLeft &gt; 0) {<br>
+                boostTimeLeft--;<br>
+                const btn = document.getElementById(&#x27;boost-btn&#x27;);<br>
+                btn.disabled = true;<br>
+                btn.innerText = `⚡ بوست ۲ برابری فعال است (${boostTimeLeft} ثانیه)`;<br>
+                if (boostTimeLeft === 0) {<br>
+                    boostMultiplier = 1;<br>
+                    btn.disabled = false;<br>
+                    btn.innerText = `🎬 تماشای تبلیغ: ۲ برابر قدرت و طلا (۶۰ ثانیه)`;<br>
+                }<br>
+            }<br>
+        }, 1000);</p>
+<p>        function saveGame() {<br>
+            localStorage.setItem(&#x27;idleArenaSave&#x27;, JSON.stringify(state));<br>
+        }</p>
+<p>        function updateUI() {<br>
+            const hero = getHeroStats();<br>
+            document.getElementById(&#x27;stage-num&#x27;).innerText = state.stage;<br>
+            document.getElementById(&#x27;gold-num&#x27;).innerText = state.gold.toLocaleString();</p>
+<p>            // هیرو<br>
+            document.getElementById(&#x27;hero-hp-bar&#x27;).style.width = `${Math.max(0, (heroCurrentHp / hero.maxHp) * 100)}%`;<br>
+            document.getElementById(&#x27;hero-hp-text&#x27;).innerText = `${Math.max(0, heroCurrentHp)}/${hero.maxHp}`;<br>
+            document.getElementById(&#x27;hero-atk-text&#x27;).innerText = hero.atk;</p>
+<p>            // دشمن<br>
+            document.getElementById(&#x27;enemy-name&#x27;).innerText = currentEnemy.name;<br>
+            document.getElementById(&#x27;enemy-avatar&#x27;).innerText = currentEnemy.icon;<br>
+            document.getElementById(&#x27;enemy-hp-bar&#x27;).style.width = `${Math.max(0, (currentEnemy.currentHp / currentEnemy.maxHp) * 100)}%`;<br>
+            document.getElementById(&#x27;enemy-hp-text&#x27;).innerText = `${Math.max(0, currentEnemy.currentHp)}/${currentEnemy.maxHp}`;<br>
+            document.getElementById(&#x27;enemy-atk-text&#x27;).innerText = currentEnemy.atk;</p>
+<p>            // ارتقاها<br>
+            document.getElementById(&#x27;atk-lvl&#x27;).innerText = state.atkLvl;<br>
+            document.getElementById(&#x27;hp-lvl&#x27;).innerText = state.hpLvl;<br>
+            document.getElementById(&#x27;spd-lvl&#x27;).innerText = state.spdLvl;</p>
+<p>            const atkCost = getUpgradeCost(&#x27;atk&#x27;);<br>
+            const hpCost = getUpgradeCost(&#x27;hp&#x27;);<br>
+            const spdCost = getUpgradeCost(&#x27;spd&#x27;);</p>
+<p>            const btnAtk = document.getElementById(&#x27;btn-upg-atk&#x27;);<br>
+            btnAtk.innerText = `${atkCost} 💰`;<br>
+            btnAtk.disabled = state.gold &lt; atkCost;</p>
+<p>            const btnHp = document.getElementById(&#x27;btn-upg-hp&#x27;);<br>
+            btnHp.innerText = `${hpCost} 💰`;<br>
+            btnHp.disabled = state.gold &lt; hpCost;</p>
+<p>            const btnSpd = document.getElementById(&#x27;btn-upg-spd&#x27;);<br>
+            btnSpd.innerText = `${spdCost} 💰`;<br>
+            btnSpd.disabled = state.gold &lt; spdCost;<br>
+        }</p>
+<p>        // شروع بازی<br>
+        restartCombatLoop();<br>
+        updateUI();<br>
+    &lt;/script&gt;<br>
+&lt;/body&gt;<br>
+&lt;/html&gt;</p>
+</body></html>
